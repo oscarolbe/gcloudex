@@ -3,12 +3,9 @@ defmodule GCloudex.CloudStorage.Impl do
   @moduledoc """
   Wrapper for Google Cloud Storage API.
   """
-  defmacro __using__(:cloud_storage) do 
-    quote do 
+  defmacro __using__(:cloud_storage) do
+    quote do
       use GCloudex.CloudStorage.Request
-
-      @endpoint "storage.googleapis.com"
-      @project  GCloudex.get_project_id
 
       ###################
       ### GET Service ###
@@ -43,7 +40,8 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec list_objects(bucket :: binary) :: HTTPResponse.t
       def list_objects(bucket) do
-        request :get, bucket, [], ""
+        headers = [{"x-goog-project-id", GCloudex.get_project_id()}]
+        request :get, bucket, headers, ""
       end
 
       @doc"""
@@ -145,7 +143,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary) :: HTTPResponse.t
       def create_bucket(bucket) do
-        headers = [{"x-goog-project-id", @project}]
+        headers = [{"x-goog-project-id", GCloudex.get_project_id()}]
 
         request :put, bucket, headers, ""
       end
@@ -157,7 +155,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary, region :: binary) :: HTTPResponse.t
       def create_bucket(bucket, region) do
-        headers = [{"x-goog-project-id", @project}]
+        headers = [{"x-goog-project-id", GCloudex.get_project_id()}]
         body    =
           """
           <CreateBucketConfiguration>
@@ -174,7 +172,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary, region :: binary, class :: binary) :: HTTPResponse.t
       def create_bucket(bucket, region, class) do
-        headers = [{"x-goog-project-id", @project}]
+        headers = [{"x-goog-project-id", GCloudex.get_project_id()}]
 
         body =
           """
@@ -384,7 +382,7 @@ defmodule GCloudex.CloudStorage.Impl do
       defp parse_query_params([{param, val} = _head | []], query), do: query <> param <> "=" <> val
       defp parse_query_params([{param, val} = _head | tail], query) do
         parse_query_params tail, query <> param <> "=" <> val <> "&"
-      end     
+      end
     end
-  end  
+  end
 end

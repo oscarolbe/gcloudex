@@ -8,12 +8,6 @@ defmodule GCloudex.CloudSQL.Impl do
     quote do 
       use GCloudex.CloudSQL.Request
 
-      @project_id   GCloudex.get_project_id
-      @instance_ep  "https://www.googleapis.com/sql/v1beta4/projects/#{@project_id}/instances"
-      @flag_ep      "https://www.googleapis.com/sql/v1beta4/flags"
-      @operation_ep "https://www.googleapis.com/sql/v1beta4/projects/#{@project_id}/operations"
-      @tiers_ep     "https://www.googleapis.com/sql/v1beta4/projects/#{@project_id}/tiers"
-
       #################
       ### Instances ###
       #################
@@ -23,7 +17,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec list_instances() :: HTTPResponse.t
       def list_instances do
-        request :get, @instance_ep, [], ""
+        request :get, get_instance_ep(), [], ""
       end
 
       @doc """
@@ -32,7 +26,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec get_instance(instance :: binary) :: HTTPResponse.t
       def get_instance(instance) do
-        request_query :get, @instance_ep, [], "", instance
+        request_query :get, get_instance_ep(), [], "", instance
       end
       
       @doc """
@@ -71,7 +65,7 @@ defmodule GCloudex.CloudSQL.Impl do
         |> Map.merge(optional_properties)
         |> Poison.encode!
 
-        request :post, @instance_ep, [{"Content-Type", "application/json"}], body
+        request :post, get_instance_ep(), [{"Content-Type", "application/json"}], body
       end
 
       @doc """
@@ -79,7 +73,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec delete_instance(instance :: binary) :: HTTPResponse.t
       def delete_instance(instance) do 
-        request_query :delete, @instance_ep, [], "", instance
+        request_query :delete, get_instance_ep(), [], "", instance
       end
 
       @doc """
@@ -108,7 +102,7 @@ defmodule GCloudex.CloudSQL.Impl do
         
         request_query(
           :post,
-           @instance_ep, 
+           get_instance_ep(), 
            [{"Content-Type", "application/json"}], 
            body, 
            instance <> "/clone"
@@ -122,7 +116,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def restart_instance(instance) do 
         request_query(
           :post, 
-          @instance_ep, 
+          get_instance_ep(), 
           [{"Content-Type", "application/json"}], 
           "", 
           instance <> "/" <> "restart"
@@ -136,7 +130,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def start_replica(instance) do 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           "",
           instance <> "/" <> "startReplica"
@@ -150,7 +144,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def stop_replica(instance) do 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           "",
           instance <> "/" <> "stopReplica"
@@ -164,7 +158,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def promote_replica(instance) do 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           "",
           instance <> "/" <> "promoteReplica"
@@ -188,7 +182,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/" <> "failover"
@@ -207,7 +201,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def reset_ssl_config(instance) do 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           "",
           instance <> "/" <> "resetSslConfig"
@@ -223,7 +217,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec list_databases(instance :: binary) :: HTTPResponse.t
       def list_databases(instance) do 
-        request_query :get, @instance_ep, [], "", instance <> "/databases"
+        request_query :get, get_instance_ep(), [], "", instance <> "/databases"
       end
 
       @doc """
@@ -235,12 +229,12 @@ defmodule GCloudex.CloudSQL.Impl do
         body = %{
           "instance" => instance,
           "name"     => name,
-          "project"  => @project_id
+          "project"  => GCloudex.get_project_id()
         } |> Poison.encode!
         
         request_query(
           :post,
-          @instance_ep, 
+          get_instance_ep(), 
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/databases"
@@ -255,7 +249,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def get_database(instance, database) do 
         request_query(
           :get, 
-          @instance_ep, 
+          get_instance_ep(), 
           [], 
           "", 
           instance <> "/databases" <> "/" <> database
@@ -269,7 +263,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def delete_database(instance, database) do 
         request_query(
           :delete, 
-          @instance_ep, 
+          get_instance_ep(), 
           [], 
           "", 
           instance <> "/databases" <> "/" <> database
@@ -288,7 +282,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :patch,
-          @instance_ep, 
+          get_instance_ep(), 
           [{"Content-Type", "application/json"}], 
           body,
           instance <> "/databases" <> "/" <> database
@@ -305,7 +299,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :put,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/databases" <> "/" <> database
@@ -321,7 +315,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec list_flags :: HTTPResponse.t
       def list_flags do 
-        request :get, @flag_ep, [], "" 
+        request :get, get_flag_ep(), [], "" 
       end
 
       ##################
@@ -336,7 +330,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def list_operations(instance) do 
         request(
           :get,
-          @operation_ep <> "?" <> "instance=#{instance}",
+          get_operation_ep() <> "?" <> "instance=#{instance}",
           [],
           ""
         )
@@ -350,7 +344,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def get_operation(operation_id) do 
         request_query(
           :get,
-          @operation_ep, 
+          get_operation_ep(), 
           [],
           "",
           operation_id
@@ -366,7 +360,7 @@ defmodule GCloudex.CloudSQL.Impl do
       """
       @spec list_tiers :: HTTPResponse.t
       def list_tiers do 
-        request :get, @tiers_ep, [], ""
+        request :get, get_tiers_ep(), [], ""
       end 
 
       #############
@@ -380,7 +374,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def list_users(instance) do 
         request_query(
           :get, 
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "users"
@@ -398,13 +392,13 @@ defmodule GCloudex.CloudSQL.Impl do
           "name"     => name,
           "password" => password,
           "host"     => host,
-          "project"  => @project_id,
+          "project"  => GCloudex.get_project_id(),
           "instance" => instance
         } |> Poison.encode!
 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/" <> "users"
@@ -422,7 +416,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :put,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           query
@@ -438,7 +432,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :delete,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           query
@@ -457,7 +451,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def list_backup_runs(instance) do 
         request_query(
           :get,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "backupRuns"
@@ -476,7 +470,7 @@ defmodule GCloudex.CloudSQL.Impl do
       defp gbr(instance, run_id) when is_integer(run_id) do 
         request_query(
           :get,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "backupRuns" <> "/" <> Integer.to_string(run_id)
@@ -486,7 +480,7 @@ defmodule GCloudex.CloudSQL.Impl do
       defp gbr(instance, run_id) do 
         request_query(
           :get,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "backupRuns" <> "/" <> run_id
@@ -505,7 +499,7 @@ defmodule GCloudex.CloudSQL.Impl do
       defp dbr(instance, run_id) when is_integer(run_id) do 
         request_query(
           :delete,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "backupRuns" <> "/" <> Integer.to_string(run_id)
@@ -515,7 +509,7 @@ defmodule GCloudex.CloudSQL.Impl do
       defp dbr(instance, run_id) do 
         request_query(
           :delete,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "backupRuns" <> "/" <> run_id
@@ -533,7 +527,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def list_ssl_certs(instance) do 
         request_query(
           :get,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "sslCerts"
@@ -550,7 +544,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def get_ssl_cert(instance, sha1_fingerprint) do 
         request_query(
           :get,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "sslCerts" <> "/" <> sha1_fingerprint
@@ -571,7 +565,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/" <> "sslCerts"
@@ -586,7 +580,7 @@ defmodule GCloudex.CloudSQL.Impl do
       def delete_ssl_cert(instance, sha1_fingerprint) do 
         request_query(
           :delete,
-          @instance_ep,
+          get_instance_ep(),
           [],
           "",
           instance <> "/" <> "sslCerts" <> "/" <> sha1_fingerprint
@@ -604,7 +598,7 @@ defmodule GCloudex.CloudSQL.Impl do
 
         request_query(
           :post,
-          @instance_ep,
+          get_instance_ep(),
           [{"Content-Type", "application/json"}],
           body,
           instance <> "/" <> "createEphemeral"

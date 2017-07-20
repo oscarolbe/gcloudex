@@ -12,8 +12,8 @@ defmodule GCloudex.Mixfile do
                    <> "Google Cloud Platform API's.",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps,
-     package: package
+     deps: deps(),
+     package: package()
     ]
   end
 
@@ -35,16 +35,16 @@ defmodule GCloudex.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.8.3"},
-      {:goth,      "~> 0.1.2"},
-      {:poison,    "~> 1.2 or ~> 2.1"},
+      {:goth,      git: "https://github.com/oscarolbe/goth", tag: "v0.5.0"},
+      {:httpoison, "~> 0.11"},
+      {:poison,    "~> 2.1 or ~> 3.1"},
       {:credo,     "~> 0.3.13", only: [:dev, :test]},
       {:ex_doc,    ">= 0.11.0", only: [:dev]},
       {:earmark,   ">= 0.0.0"}
     ]
   end
 
-  defp package do 
+  defp package do
     [
      maintainers: ["Sasha Fonseca"],
      licenses: ["Apache 2.0"],

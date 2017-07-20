@@ -10,8 +10,6 @@ defmodule GCloudex.CloudSQL.Request do
   defmacro __using__(_opts) do 
     quote do 
 
-      @project_id GCloudex.get_project_id
-
       @doc """
       Sends a HTTP request with the given 'verb', 'headers' and 'body' to the 
       specified 'endpoint'. The authorization and google project headers are 
@@ -23,7 +21,7 @@ defmodule GCloudex.CloudSQL.Request do
           verb,
           endpoint,
           body,
-          headers ++ [{"x-goog-project-id", @project_id},
+          headers ++ [{"x-goog-project-id", GCloudex.get_project_id()},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:sql_admin)}"}],
           []
           )
@@ -40,7 +38,7 @@ defmodule GCloudex.CloudSQL.Request do
           verb,
           endpoint <> "/" <> parameters,
           body,
-          headers ++ [{"x-goog-project-id", @project_id},
+          headers ++ [{"x-goog-project-id", GCloudex.get_project_id()},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:sql_admin)}"}],
           []
           )
